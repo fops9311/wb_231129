@@ -36,6 +36,7 @@ func main() {
 	fmt.Printf("mine is faster x%.2f times\n", float64(d2)/float64(d1))
 }
 
+// первая ссылка гугла. реализация в лоб
 func quickSort(arr []int, low int, high int) {
 	if low < high {
 		pi := partion(arr, low, high)
@@ -62,6 +63,7 @@ func partion(arr []int, low int, high int) int {
 	return i + 1
 }
 
+// выдано YandexGPT2 :)
 func isSorted(arr []int) bool {
 	if len(arr) < 2 {
 		return true
@@ -76,17 +78,15 @@ func isSorted(arr []int) bool {
 	return true
 }
 
-var itrecount = 0
-
+// мой улучшенный алгоритм квиксорт
 func qsort(s []int) int {
-
+	//массив из нуля и 1 элемента уже отсортирован
 	if len(s) < 2 {
 		return 0
 	}
-	itrecount++
+	//нахождение среднего индекса массива
 	middleId := len(s) / 2
-
-	//fmt.Println(itrecount, "|iteration len:", len(s), "slice:", s, "middle:", middleId)
+	//функции сравнения (замыкание)
 	smaller := func(i int) bool {
 		if i < s[middleId] {
 			return true
@@ -99,14 +99,13 @@ func qsort(s []int) int {
 		}
 		return false
 	}
-
+	//поиск значений больше середины слева
 	leftIds := Find(s, 0, middleId, bigger)
+	//поиск значений меньше середины справа
 	rightIds := Find(s, middleId, len(s)-1, smaller)
-	//fmt.Println(itrecount, "|left ids:", leftIds, "right ids:", rightIds)
+	//замены значений
 	middleId = Swap(s, leftIds, rightIds, middleId)
-
-	//fmt.Println(itrecount, "|iteration end len:", len(s), "slice:", s, "middle:", middleId)
-
+	//рекурсивный вызов для двух оставшихся половин
 	qsort(s[0:middleId])
 	if middleId < len(s) {
 		qsort(s[middleId+1:])
@@ -114,7 +113,7 @@ func qsort(s []int) int {
 	return middleId
 }
 
-func Find(s []int, low int, high int, f func(int) bool) []int {
+func Find[T compareble](s []T, low T, high T, f func(T) bool) []T {
 	res := make([]int, 0)
 	for i := range s[low : high+1] {
 		id := i + low
@@ -124,41 +123,28 @@ func Find(s []int, low int, high int, f func(int) bool) []int {
 	}
 	return res
 }
-func Swap(s []int, leftIds []int, rightIds []int, middleId int) int {
-	//fmt.Print("Swap")
+func Swap[T compareble](s []int, leftIds []int, rightIds []int, middleId int) int {
 	if (len(leftIds) == 0) && (len(rightIds) == 0) {
-		//fmt.Println("0")
 		return middleId
 	}
-
-	//fmt.Println("s:", s)
-	//fmt.Println("e")
 	if len(leftIds) == len(rightIds) {
 		for i := range leftIds {
-			//fmt.Printf("s[%d], s[%d] = s[%d], s[%d]\n", leftIds[i], rightIds[i], rightIds[i], leftIds[i])
 			s[leftIds[i]], s[rightIds[i]] = s[rightIds[i]], s[leftIds[i]]
-
-			//fmt.Println("s:", s)
 		}
 		return middleId
 	}
-	//fmt.Println("l")
 	if len(leftIds) < len(rightIds) {
 		for i := range leftIds {
 			s[leftIds[i]], s[rightIds[i]] = s[rightIds[i]], s[leftIds[i]]
 		}
 		leftovers := rightIds[len(leftIds):]
-		//fmt.Println("right leftovers:", leftovers)
-
 		return Reflect(s, leftovers, middleId)
 	}
-	//fmt.Println("r")
 	if len(rightIds) < len(leftIds) {
 		for i := range rightIds {
 			s[leftIds[i]], s[rightIds[i]] = s[rightIds[i]], s[leftIds[i]]
 		}
 		leftovers := leftIds[len(rightIds):]
-		//fmt.Println("left leftovers:", leftovers, "s:", s, "middle:", middleId)
 
 		return Reflect(s, leftovers, middleId)
 	}
@@ -170,17 +156,14 @@ func Reflect(s []int, Ids []int, middleId int) int {
 	}
 	lefty := middleId > Ids[0]
 	iter := func(i int) {
-		//fmt.Println("Reflect iter start:", s, "middle:", middleId, "id:", i)
 		if middleId == i+1 {
 			s[middleId], s[i] = s[i], s[middleId]
 			middleId--
-			//fmt.Println("1Reflect iter end:", s, "middle:", middleId, "id:", i)
 			return
 		}
 		if middleId == i-1 {
 			s[middleId], s[i] = s[i], s[middleId]
 			middleId++
-			//fmt.Println("2Reflect iter end:", s, "middle:", middleId, "id:", i)
 			return
 		}
 		if i > middleId {
@@ -188,7 +171,6 @@ func Reflect(s []int, Ids []int, middleId int) int {
 
 			s[middleId], s[i] = s[i], s[middleId]
 			middleId++
-			//fmt.Println("3Reflect iter end:", s, "middle:", middleId, "id:", i)
 			return
 		}
 		if i < middleId {
@@ -196,11 +178,8 @@ func Reflect(s []int, Ids []int, middleId int) int {
 
 			s[middleId], s[i] = s[i], s[middleId]
 			middleId--
-			//fmt.Println("4Reflect iter end:", s, "middle:", middleId, "id:", i)
 			return
 		}
-		//fmt.Println("5Reflect iter end:")
-
 	}
 	if lefty {
 		for i := len(Ids) - 1; i >= 0; i-- {
